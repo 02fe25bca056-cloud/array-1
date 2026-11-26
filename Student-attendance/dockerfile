@@ -1,0 +1,38 @@
+import unittest
+import json
+import os
+import tempfile
+
+
+class TestAttendance(unittest.TestCase):
+
+    def test_save_and_load_records(self):
+        records = {
+            "2026-10-15": {
+                "Asha": "Present",
+                "Rahul": "Absent"
+            }
+        }
+
+        with tempfile.TemporaryDirectory() as folder:
+            path = os.path.join(folder, "attendance.json")
+
+            with open(path, "w") as file:
+                json.dump(records, file)
+
+            with open(path, "r") as file:
+                loaded = json.load(file)
+
+        self.assertEqual(loaded, records)
+
+    def test_attendance_percentage(self):
+        present = 3
+        total = 4
+
+        percentage = present / total * 100
+
+        self.assertEqual(percentage, 75.0)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,57 @@
+from flask import Flask, request
+
+app = Flask(__name__)
+
+def calculate_grade(avg):
+    if avg >= 90:
+        return "A+"
+    elif avg >= 80:
+        return "A"
+    elif avg >= 70:
+        return "B"
+    elif avg >= 60:
+        return "C"
+    elif avg >= 50:
+        return "D"
+    return "F"
+
+@app.route("/", methods=["GET", "POST"])
+def student_result():
+    if request.method == "POST":
+        name = request.form["name"]
+        usn = request.form["usn"]
+        program = request.form["program"]
+        semester = request.form["semester"]
+        marks = [float(x) for x in request.form["marks"].split(",")]
+
+        if not marks or any(x < 0 or x > 100 for x in marks):
+            return "Marks must be between 0 and 100.", 400
+
+        average = sum(marks) / len(marks)
+        grade = calculate_grade(average)
+
+        return f"""
+        <h2>Student Result</h2>
+        Name: {name}<br>
+        USN: {usn}<br>
+        Program: {program}<br>
+        Semester: {semester}<br>
+        Marks: {marks}<br>
+        Average: {average:.2f}<br>
+        Grade: {grade}
+        """
+
+    return """
+    <h2>Student Grade Calculator</h2>
+    <form method="post">
+      Name: <input name="name" required><br><br>
+      USN: <input name="usn" required><br><br>
+      Program: <input name="program" required><br><br>
+      Semester: <input name="semester" required><br><br>
+      Marks: <input name="marks" placeholder="80,90,75" required><br><br>
+      <button type="submit">Calculate Grade</button>
+    </form>
+    """
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
